@@ -1,0 +1,26 @@
+{
+  "name": "instagram-monitoring-tool",
+  "version": "1.0.0",
+  "description": "An tool to track UIdaho Esports social accounts",
+  "homepage": "https://github.com/endeav007/Instagram-Monitoring-Tool#readme",
+  "bugs": {
+    "url": "https://github.com/endeav007/Instagram-Monitoring-Tool/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endeav007/Instagram-Monitoring-Tool.git"
+  },
+  "license": "ISC",
+  "author": "Autumn A.",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2"
+  }
+}

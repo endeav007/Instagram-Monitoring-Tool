@@ -67,8 +67,9 @@ app.get("/success", async (req, res) => {
   const SP_ID = SPLATOON_ID; 
 try
 {
+  //try if else statement here to get response, and redirect
   const response = await axios.get(
-  `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count}&access_token=${token}`
+  `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
   );
 
   console.log("Instagram data:", response.data.media.data[0]);

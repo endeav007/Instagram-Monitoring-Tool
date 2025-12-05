@@ -5,11 +5,12 @@ import App from './App';
 import WeeklyData from './WeeklyData';
 import reportWebVitals from './reportWebVitals';
 import GameSelect from './GameSelect';
+import AccountComparison from './AccountComparisons';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <GameSelect />
+    <AccountComparison />
   </React.StrictMode>
 );
 

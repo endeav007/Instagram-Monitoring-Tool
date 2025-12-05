@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { compareDate } from'./helperfunctions';
 import axios from 'axios';
-function WeeklyData(){
+function WeeklyData(game){
 
-    const [data, setData] = useState(null);
-    const [date, setDate] = useState("");
     
-    function handleDateInput(newDate){
-        setDate(newDate.target.value);
+    const [data, setData] = useState(null);
+    const [before, setBefore] = useState("");
+    const [after, setAfter] = useState("");
+    
+    function handleBefore(newdate){
+        setBefore(newdate.target.value);
+    }
+
+    function handleAfter(newdate){
+        setAfter(newdate.target.value);
     }
     const handleClick = async () => {
         try{
-            const _data = await (await fetch('/success')).json();
+            const response = await fetch(game.game);
+            const _data = await response.json();
             setData(_data.instagram.media.data);
             
         } catch (err) {
@@ -24,17 +31,10 @@ function WeeklyData(){
         if (data) {
 
             data.forEach(element => {
-
-                /*
-                if(compareDate(element.timestamp)){
-                    weekly.push(element);
-                }
-                */
-               if(element.timestamp > date){
+               if(element.timestamp > after && element.timestamp < before){
                     weekly.push(element);
                }
             });
-            console.log(weekly)
             return( 
                 <div>
                     <ul>
@@ -51,10 +51,12 @@ function WeeklyData(){
     return(
         <div>
             <form>
-                <label for="post-date" > Show Data From Posts After: </label>
-                <input type="date" value={date} id="post-date" name="post-date" onChange={handleDateInput} /> 
+                <label for="before-date" > Show Data From Posts Before: </label>
+                <input type="date" value={before} id="before-date" name="before-date" onChange={handleBefore} /> <br></br>
+                <label for="after-date" > Show Data From Posts After: </label>
+                <input type="date" value={after} id="after-date" name="after-date" onChange={handleAfter} />
             </form>
-            <p> {date} </p>
+            
             <button onClick={handleClick}> Show Data </button>
             {checkResponse(data)}
         </div>

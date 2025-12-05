@@ -4,11 +4,12 @@ import './index.css';
 import App from './App';
 import WeeklyData from './WeeklyData';
 import reportWebVitals from './reportWebVitals';
+import GameSelect from './GameSelect';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <WeeklyData />
+    <GameSelect />
   </React.StrictMode>
 );
 

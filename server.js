@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000; //will set to port 3000, OR the users por
 const { APP_ID, APP_SECRET, INSTAGRAM_REDIRECT_URI, SESSION_SECRET, INSTAGRAM_ID, OVERWATCH_ID, SPLATOON_ID, VALORANT_ID, TEKKEN_ID, 
   MARVELRIVALS_ID, COUNTERSTRIKE_ID, STREETFIGHTER_ID, FORTNITE_ID, SMASH_ID, LEAGUEOFLEGENDS_ID, RAINBOWSIXSIEGE_ID, ROCKETLEAGUE_ID} = process.env;
 
-//app.use(express.static(path.resolve(__dirname, '../client/build')));
+
 app.use(
   session({
     secret: SESSION_SECRET,
@@ -48,10 +48,7 @@ app.get("/auth/instagram/callback", async (req, res) => {
 
     const access_token = tokenResponse.data.access_token;
     req.session.access_token = access_token;
-    //console.log("Access token received:", access_token);
-
-    // 33. Redirect user to a success page
-    // Optionally, store token in session or database instead of passing in URL
+    //redirect can be removed once we're done here
     res.redirect("/success");
   } catch (err) {
     console.error(err.response?.data || err.message);
@@ -60,12 +57,13 @@ app.get("/auth/instagram/callback", async (req, res) => {
 });
 
 
+//success will be the main page
+
 app.get("/success", async (req, res) => {
   const token = req.session.access_token;
   const IG_ID = INSTAGRAM_ID;
   try
   {
-    //try if else statement here to get response, and redirect to /splatoon, /overwatch, /main, etc.
     const response = await axios.get(
     `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count}&access_token=${token}`
     );

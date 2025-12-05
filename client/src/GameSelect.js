@@ -1,4 +1,13 @@
-import React, { useEffect, useState } from 'react';
+/*
+    GameSelect.js
+    *** Decription ***
+    Game Select will handle showing us information per account using a drop down menu
+    We'll reference other functions here that require specfic account metrics
+
+    *** Functions Used ***
+    WeeklyData - used to display information about a specfic account based on the user's input. 
+*/
+import React, { useState } from 'react';
 import WeeklyData from './WeeklyData';
 
 function GameSelect(){

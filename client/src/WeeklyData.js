@@ -1,6 +1,12 @@
+/*
+    WeeklyData.js
+    *** Decription ***
+    Weekly Data is used to display data based on a range of dates given by the user. 
+
+*/
+
 import React, { useEffect, useState } from 'react';
-import { compareDate } from'./helperfunctions';
-import axios from 'axios';
+
 function WeeklyData(game){
 
     

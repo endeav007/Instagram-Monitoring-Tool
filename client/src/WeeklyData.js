@@ -22,6 +22,7 @@ function WeeklyData(game){
         setAfter(newdate.target.value);
     }
     const handleClick = async () => {
+        console.log(game.game);
         try{
             const response = await fetch(game.game);
             const _data = await response.json();
@@ -45,7 +46,7 @@ function WeeklyData(game){
                 <div>
                     <ul>
                         {weekly.map(post => (
-                        <li key={post.id}> Caption: {post.caption} Post Likes: {post.like_count}</li>
+                        <li key={post.id}> Caption: {post.caption} Post Likes:  </li>
                     ))}
                     </ul>
                 </div>

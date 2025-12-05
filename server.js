@@ -65,8 +65,24 @@ app.get("/success", async (req, res) => {
   try
   {
     const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch{
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
 
     console.log("Instagram data:", response.data.media.data[0]);
     res.json({
@@ -82,18 +98,37 @@ app.get("/success", async (req, res) => {
 
 app.get("/overwatch2", async (req, res) => {
   const token = req.session.access_token;
-  const OW_ID = OVERWATCH_ID;
+  const IG_ID = OVERWATCH_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${OW_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
-      message: "yuh",
+      message: "Login successful!",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -101,18 +136,36 @@ app.get("/overwatch2", async (req, res) => {
 
 app.get("/splatoon3", async (req, res) => {
   const token = req.session.access_token;
-  const SP_ID = SPLATOON_ID;
+  const IG_ID = SPLATOON_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${SP_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
-      message: "yuh",
+      message: "Login successful!",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -120,18 +173,36 @@ app.get("/splatoon3", async (req, res) => {
 
 app.get("/valorant", async (req, res) => {
   const token = req.session.access_token;
-  const VA_ID = VALORANT_ID;
+  const IG_ID = VALORANT_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${VA_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
-      message: "yuh",
+      message: "Login successful!",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -139,18 +210,36 @@ app.get("/valorant", async (req, res) => {
 
 app.get("/tekken", async (req, res) => {
   const token = req.session.access_token;
-  const TK_ID = TEKKEN_ID;
+  const IG_ID = TEKKEN_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${TK_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -158,18 +247,36 @@ app.get("/tekken", async (req, res) => {
 
 app.get("/marvelrivals", async (req, res) => {
   const token = req.session.access_token;
-  const MA_ID = MARVELRIVALS_ID;
+  const IG_ID = MARVELRIVALS_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${MA_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
-      message: "yuh",
+      message: "Login successful!",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -177,18 +284,36 @@ app.get("/marvelrivals", async (req, res) => {
 
 app.get("/counterstrike2", async (req, res) => {
   const token = req.session.access_token;
-  const CO_ID = COUNTERSTRIKE_ID;
+  const IG_ID = COUNTERSTRIKE_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${CO_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -196,18 +321,36 @@ app.get("/counterstrike2", async (req, res) => {
 
 app.get("/streetfighter", async (req, res) => {
   const token = req.session.access_token;
-  const ST_ID = STREETFIGHTER_ID;
+  const IG_ID = STREETFIGHTER_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${ST_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch{
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -215,18 +358,36 @@ app.get("/streetfighter", async (req, res) => {
 
 app.get("/fortnite", async (req, res) => {
   const token = req.session.access_token;
-  const FO_ID = FORTNITE_ID;
+  const IG_ID = FORTNITE_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${FO_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch{
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -234,18 +395,36 @@ app.get("/fortnite", async (req, res) => {
 
 app.get("/smashultimate", async (req, res) => {
   const token = req.session.access_token;
-  const SM_ID = SMASH_ID;
+  const IG_ID = SMASH_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${SM_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -253,18 +432,36 @@ app.get("/smashultimate", async (req, res) => {
 
 app.get("/leagueoflegends", async (req, res) => {
   const token = req.session.access_token;
-  const LE_ID = LEAGUEOFLEGENDS_ID;
+  const IG_ID = LEAGUEOFLEGENDS_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${LE_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -272,18 +469,36 @@ app.get("/leagueoflegends", async (req, res) => {
 
 app.get("/rainbowsixsiege", async (req, res) => {
   const token = req.session.access_token;
-  const RA_ID = RAINBOWSIXSIEGE_ID;
+  const IG_ID = RAINBOWSIXSIEGE_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${RA_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 
@@ -291,18 +506,36 @@ app.get("/rainbowsixsiege", async (req, res) => {
 
 app.get("/rocketleague", async (req, res) => {
   const token = req.session.access_token;
-  const RO_ID = ROCKETLEAGUE_ID;
+  const IG_ID = ROCKETLEAGUE_ID;
   try{
     const response = await axios.get(
-      `https://graph.facebook.com/v19.0/${RO_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp,like_count,embed}&access_token=${token}`
+    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
+
+    for (let media of response.data.media.data) {
+
+      try{
+          const insightsResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
+        );
+        media.insights = {};
+        for (let metric of insightsResponse.data.data) {
+          media.insights[metric.name] = metric.values[0].value;
+        }
+      }
+      catch(err){
+        console.error("Error fetching Instagram data:", err.response?.data || err.message);
+      }
+    }
+
+    console.log("Instagram data:", response.data.media.data[0]);
     res.json({
       message: "yuh",
       instagram: response.data
     });
 
   } catch(err){
-    onsole.error("Error fetching Instagram data:", err.response?.data || err.message);
+    console.error("Error fetching Instagram data:", err.response?.data || err.message);
     res.status(500).send("Failed to fetch Instagram data");
   }
 

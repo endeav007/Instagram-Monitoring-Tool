@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-function WeeklyData(game){
+function WeeklyData({game}){
 
     
     const [data, setData] = useState(null);
@@ -22,11 +22,12 @@ function WeeklyData(game){
         setAfter(newdate.target.value);
     }
     const handleClick = async () => {
-        console.log(game.game);
+        //console.log(game);
         try{
-            const response = await fetch(game.game);
+            const response = await fetch(game);
             const _data = await response.json();
             setData(_data.instagram.media.data);
+            //console.log(_data.instagram.media.data);
             
         } catch (err) {
             console.log(err.message)
@@ -34,11 +35,14 @@ function WeeklyData(game){
     }
 
     function checkResponse(data) {
+        const beforeDate = new Date(before);
+        const afterDate = new Date(after);
         let weekly = [];
         if (data) {
 
             data.forEach(element => {
-               if(element.timestamp > after && element.timestamp < before){
+                const postDate = new Date(element.timestamp);
+               if(postDate > afterDate && postDate < beforeDate){
                     weekly.push(element);
                }
             });
@@ -46,7 +50,7 @@ function WeeklyData(game){
                 <div>
                     <ul>
                         {weekly.map(post => (
-                        <li key={post.id}> Caption: {post.caption} Post Likes:  </li>
+                        <li key={post.id}> Caption: {post.caption} Post Likes: {post.insights.likes}  </li>
                     ))}
                     </ul>
                 </div>

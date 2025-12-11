@@ -10,7 +10,7 @@ import AccountComparison from './AccountComparisons';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AccountComparison />
+    <AccountComparison/>
   </React.StrictMode>
 );
 

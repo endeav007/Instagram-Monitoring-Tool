@@ -2,56 +2,50 @@ import React, { useEffect, useState } from 'react';
 import {compareDate} from './helperfunctions';
 
 function AccountComparisons(){
-    const [accountsData, setAccountsData] = useState([]);
-    const accounts = ['/success', '/counterstrike2'];
+    const [allPosts, setAllPosts] = useState({});
+    const [loading, setLoading] = useState(false);
 
-    const fetchAllAccounts = async () => {
-  try {
-    console.log("Starting fetch for all accounts...");
+    const fetchAllWeeklyPosts = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/account/weekly/all");
+        const data = await response.json();
+        // data.data is an object { accountName1: [...posts], accountName2: [...posts], ... }
+        console.log(data.data);
+        setAllPosts(data.data);
+      } catch (err) {
+        console.error("Error fetching weekly posts for all accounts:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Fetch all accounts in parallel
-    const results = await Promise.all(
-      accounts.map(async (account) => {
-        try {
-          const res = await fetch(account);
-          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-          const data = await res.json();
-
-          // Keep the media array (or empty if missing)
-          const mediaArray = data.instagram?.media?.data || [];
-          //console.log(`Fetched data for ${account}:`, mediaArray);
-
-          const filteredMedia = mediaArray.filter(media => {
-            return compareDate(media.timestamp); //will return posts from the last week
-          });
-
-          return { account, media: filteredMedia }; // nested structure
-        } catch (err) {
-          console.error(`Error fetching ${account}:`, err);
-          return { account, media: [] }; // return empty array if fetch fails
-        }
-      })
-    );
-
-    // Update state once
-    setAccountsData(results);
-
-    console.log("All accounts data updated:", results);
-
-  } catch (err) {
-    console.error("Unexpected error in fetchAllAccounts:", err);
-  }
-};
-
-// Call the function on mount
-useEffect(() => {
-  fetchAllAccounts();
-}, []);
-
-
+    console.log(allPosts);
+    
    return(
     <>
-    
+      <div>
+      <button onClick={fetchAllWeeklyPosts} disabled={loading}>
+        {loading ? "Loading..." : "Load Weekly Posts for All Accounts"}
+      </button>
+
+      {Object.entries(allPosts).map(([accountName, posts]) => (
+        <div key={accountName}>
+          <h2>{accountName}</h2>
+          <ul>
+            {posts.map((post) => (
+              <li key={post.id}>
+                <p>{post.caption}</p>
+                <p>Likes: {post.insights?.likes || 0}</p>
+                <p>Comments: {post.insights?.comments || 0}</p>
+                <p>Timestamp: {post.timestamp}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+      
     </>
    );
 

@@ -7,7 +7,26 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000; //will set to port 3000, OR the users port
 const { APP_ID, APP_SECRET, INSTAGRAM_REDIRECT_URI, SESSION_SECRET, INSTAGRAM_ID, OVERWATCH_ID, SPLATOON_ID, VALORANT_ID, TEKKEN_ID, 
-  MARVELRIVALS_ID, COUNTERSTRIKE_ID, STREETFIGHTER_ID, FORTNITE_ID, SMASH_ID, LEAGUEOFLEGENDS_ID, RAINBOWSIXSIEGE_ID, ROCKETLEAGUE_ID} = process.env;
+MARVELRIVALS_ID, COUNTERSTRIKE_ID, STREETFIGHTER_ID, FORTNITE_ID, SMASH_ID, LEAGUEOFLEGENDS_ID, RAINBOWSIXSIEGE_ID, ROCKETLEAGUE_ID} = process.env;
+
+const CACHE_DURATION = 15 * 60 * 1000;
+
+const cacheMap = {};
+const accounts ={
+  success: INSTAGRAM_ID,
+  overwatch2: OVERWATCH_ID,
+  splatoon3: SPLATOON_ID,
+  valorant: VALORANT_ID,
+  tekken: TEKKEN_ID,
+  marvelrivals: MARVELRIVALS_ID,
+  counterstrike2: COUNTERSTRIKE_ID,
+  streetfighter: STREETFIGHTER_ID,
+  fortnite: FORTNITE_ID,
+  smashultimate: SMASH_ID,
+  leagueoflegends: LEAGUEOFLEGENDS_ID,
+  rainbowsixsiege: RAINBOWSIXSIEGE_ID,
+  rocketleague: ROCKETLEAGUE_ID
+};
 
 
 app.use(
@@ -49,7 +68,7 @@ app.get("/auth/instagram/callback", async (req, res) => {
     const access_token = tokenResponse.data.access_token;
     req.session.access_token = access_token;
     //redirect can be removed once we're done here
-    res.redirect("/success");
+    res.redirect("/account/success");
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).send("Failed to exchange code for token");
@@ -57,300 +76,52 @@ app.get("/auth/instagram/callback", async (req, res) => {
 });
 
 
-//success will be the main page
-
-app.get("/success", async (req, res) => {
+app.get("/account/:name", async (req, res) =>
+{
+  const name = req.params.name;
+  const IG_ID = accounts[name];
+  if (!IG_ID) return res.status(404).send("Account not found");
   const token = req.session.access_token;
-  const IG_ID = INSTAGRAM_ID;
-  try
-  {
+  const now = Date.now();
+
+  if (cacheMap[IG_ID] && now - cacheMap[IG_ID].lastFetch < CACHE_DURATION) {
+    return res.json(cacheMap[IG_ID].data);
+  }
+
+   try {
+    // Fetch account media
     const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
+      `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media.limit(50){id,caption,media_type,media_url,timestamp}&access_token=${token}`
     );
 
+    // Fetch insights for media
     response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "Login successful!",
-      instagram: response.data
-    });
-      
+
+    // Cache the result
+    cacheMap[IG_ID] = {
+      data: { message: "Login successful!", instagram: response.data },
+      lastFetch: now
+    };
+
+    console.log(cacheMap[IG_ID].data);
+
+    return res.json(cacheMap[IG_ID].data);
+
   } catch (err) {
     console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-});
-
-app.get("/overwatch2", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = OVERWATCH_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "Login successful!",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
+    return res.status(500).send("Failed to fetch Instagram data");
   }
 
 });
 
-app.get("/splatoon3", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = SPLATOON_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "Login successful!",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/valorant", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = VALORANT_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "Login successful!",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/tekken", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = TEKKEN_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/marvelrivals", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = MARVELRIVALS_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "Login successful!",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/counterstrike2", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = COUNTERSTRIKE_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/streetfighter", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = STREETFIGHTER_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/fortnite", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = FORTNITE_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/smashultimate", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = SMASH_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/leagueoflegends", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = LEAGUEOFLEGENDS_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/rainbowsixsiege", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = RAINBOWSIXSIEGE_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
-
-app.get("/rocketleague", async (req, res) => {
-  const token = req.session.access_token;
-  const IG_ID = ROCKETLEAGUE_ID;
-  try{
-    const response = await axios.get(
-    `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media{id,caption,media_type,media_url,timestamp}&access_token=${token}`
-    );
-
-    response.data.media.data = await fetchMediaWithInsights(response.data.media.data, token);
-    console.log("Instagram data:", response.data.media.data[0]);
-    res.json({
-      message: "yuh",
-      instagram: response.data
-    });
-
-  } catch(err){
-    console.error("Error fetching Instagram data:", err.response?.data || err.message);
-    res.status(500).send("Failed to fetch Instagram data");
-  }
-
-});
 
 //function to get insights in each app.get
 async function fetchMediaWithInsights(mediaArray, token) {
+  //const recentMedia = mediaArray.filter(m => compareDate(m.timestamp))
+  const recentMedia = mediaArray;
+
   return await Promise.all(
-    mediaArray.map(async (media) => {
+    recentMedia.map(async (media) => {
       try {
         const insightsResponse = await axios.get(
           `https://graph.facebook.com/v19.0/${media.id}/insights?metric=likes,comments,shares,total_interactions,views,reposts&access_token=${token}`
@@ -367,6 +138,57 @@ async function fetchMediaWithInsights(mediaArray, token) {
   );
 }
 
+
+async function fetchWeeklyData(IG_ID, token){
+    try{
+      const response = await axios.get(
+      `https://graph.facebook.com/v19.0/${IG_ID}?fields=id,username,media.limit(50){id,caption,media_type,media_url,timestamp}&access_token=${token}`
+    );
+
+      let mediaArray = response.data.media?.data || [];
+
+      const pastWeekMedia = mediaArray.filter((post) => SinceSunday(post.timestamp));
+
+      const pastWeekWithInsights = await fetchMediaWithInsights(pastWeekMedia, token);
+      return pastWeekWithInsights;
+
+    } catch(err){
+      console.error("Error feching Instagram media:", err.response?.data || err.message);
+      return [];
+    }
+}
+
+app.get("/account/weekly/all", async (req, res) => {
+  const token = req.session.access_token;
+
+  try{
+    const results = {};
+
+    for(const[name, IG_ID] of Object.entries(accounts)){
+      const media = await fetchWeeklyData(IG_ID, token);
+      results[name] = media;
+    }
+
+    res.json({ message: "Fetched past week for all accounts", data: results });
+
+  } catch(err){
+    console.error("Error fetching past week for all accounts:", err.message);
+    res.status(500).send("Failed to fetch data");
+  }
+
+});
+
+
+
+function SinceSunday(post_date)
+{
+  const sunday = new Date();
+  sunday.setDate(sunday.getDate()-sunday.getDay());
+  const post = new Date(post_date);
+  sunday.setHours(0, 0, 0, 0);
+  if(post > sunday){return true;}
+  return false;
+}
 
 // Starts server. Go to http://localhost:3000/auth/facebook to log in and give access code.
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
